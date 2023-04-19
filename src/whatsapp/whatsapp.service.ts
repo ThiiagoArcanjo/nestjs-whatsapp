@@ -6,6 +6,8 @@ import * as qrcode from 'qrcode-terminal';
 import { menu } from './consts/menu';
 import * as path from 'path';
 import * as fs from 'fs';
+import { promises } from 'dns';
+import { ResDTO } from 'src/shared/consts/res.dto';
 
 @Injectable()
 export class WhatsappService {
@@ -61,5 +63,22 @@ export class WhatsappService {
 
   transformPhoneNumber(phoneNumber: string) {
     return `55${phoneNumber.replace(/\D/g, '')}@c.us`;
+  }
+
+  async enviarMensagem(sistema, celular, msg): Promise<ResDTO> {
+    try {
+      const resultado = this.client.sendMessage(this.transformPhoneNumber(celular), msg);
+      console.log(resultado);
+    } catch (error) {
+      return<ResDTO>{
+        success: false,
+        message: 'Houve um erro ao enviar a mensagem'+error
+      }
+    }
+    
+  }
+
+  sendMessage(celular, msg){
+    this.client.sendMessage(this.transformPhoneNumber(celular), msg);
   }
 }
