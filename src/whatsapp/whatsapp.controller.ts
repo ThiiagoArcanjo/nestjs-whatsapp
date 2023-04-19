@@ -12,53 +12,27 @@ import { WhatsappService } from './whatsapp.service';
 import { CreateWhatsappDto } from './dto/create-whatsapp.dto';
 import { UpdateWhatsappDto } from './dto/update-whatsapp.dto';
 import { ResDTO } from 'src/shared/consts/res.dto';
+import { WhatsappMsgDto } from './dto/whatsapp-msg.dto';
 
 @Controller('whatsapp')
 export class WhatsappController {
   constructor(private readonly whatsappService: WhatsappService) { }
-
-  @Get()
-  async findAll() {
-    console.log('findAll()');
-    return [];
-  }
-
-  @Get('enviar-mensagem/:sistema/:celular/:msg')
+  
+  /* Enviando mensagem para o cliente*/
+  @Post('enviar-mensagem')
   async enviarMensagem(
-    @Param('sistema') sistema: string,
-    @Param('celular') celular: string,
-    @Param('msg') msg: string,
+    @Body() msg: WhatsappMsgDto,
   ): Promise<ResDTO> {
     try {
-     
-     return await this.whatsappService.enviarMensagem(sistema, celular, msg);
+     return await this.whatsappService.enviarMensagem(msg);
  
     } catch (error) {
       return <ResDTO>{
         success: false,
-        message: 'Houve um erro ao enviar a mensagem: ' + error,
+        message: 'Houve um erro no controller ao enviar a mensagem: ' + error,
       }
     }
 
   }
 
-
-  @Get('enviar-mensagem2/:celular/:msg')
-  enviarMensagem2(
-    @Param('celular') celular: string,
-    @Param('msg') msg: string,
-  ) {
-    try {
-      console.log(celular);
-      console.log(msg);
-      this.whatsappService.sendMessage(celular, msg);
- 
-    } catch (error) {
-      return <ResDTO>{
-        success: false,
-        message: 'Houve um erro ao enviar a mensagem: ' + error,
-      }
-    }
-
-  }
 }

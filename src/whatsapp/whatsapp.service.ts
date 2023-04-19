@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { promises } from 'dns';
 import { ResDTO } from 'src/shared/consts/res.dto';
+import { WhatsappMsgDto } from './dto/whatsapp-msg.dto';
 
 @Injectable()
 export class WhatsappService {
@@ -50,12 +51,10 @@ export class WhatsappService {
     });
 
     this.client.on('message', (msg) => {
-      if (msg.body == '!ping') {
-        msg.reply('pong');
+      if (msg.body != null) {
+        msg.reply('Por favor, não responda esse número, pois é somente para enviar mensagens automaticas.');
       }
-      // * phone number format: 11 987654321
-      // * transform to 5511987654321@c.us
-      /* this.client.sendMessage(this.transformPhoneNumber('11 941666617'), 'pong'); */
+
     });
 
     this.client.initialize();
@@ -65,20 +64,20 @@ export class WhatsappService {
     return `55${phoneNumber.replace(/\D/g, '')}@c.us`;
   }
 
-  async enviarMensagem(sistema, celular, msg): Promise<ResDTO> {
+  async enviarMensagem(msg: WhatsappMsgDto): Promise<ResDTO> {
+    console.log(this.transformPhoneNumber(msg.numero));
     try {
-      const resultado = this.client.sendMessage(this.transformPhoneNumber(celular), msg);
-      console.log(resultado);
+      
+      const resultado = await this.client.sendMessage(this.transformPhoneNumber(msg.numero), msg.msg);
+      
     } catch (error) {
       return<ResDTO>{
         success: false,
-        message: 'Houve um erro ao enviar a mensagem'+error
+        message: 'Houve um erro no serviço ao enviar a mensagem'+error
       }
     }
     
   }
 
-  sendMessage(celular, msg){
-    this.client.sendMessage(this.transformPhoneNumber(celular), msg);
-  }
+
 }
